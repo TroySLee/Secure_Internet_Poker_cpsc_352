@@ -18,6 +18,8 @@ from message import Message as M
 
 
 class Server:
+    num_rounds = 3
+
     '''
     Server class for Secure Internet Poker Game
     '''
@@ -46,153 +48,22 @@ class Server:
     def start_game(self) -> None:
         '''
         Start the Secure Internet Poker Game
-        
-        Steps:
-            1. Wait for players to join
-            2. Create and distrubute player hands
-            3. Wait for players to choose cards
-            4. Send round data to players
-            5. Repeat steps 3-4 two more times (-3 for last round)
-            6. Print final results
-            7. End the game
         '''
         
-        ### WAIT FOR PLAYERS TO JOIN #######################################################################
         self.accept_players()
-
-        # Gather player info after both players have joined
         player1_conn, player1_session_key, player1_public_key = self.clients[1]
         player2_conn, player2_session_key, player2_public_key = self.clients[2]
 
-        ### CREATE AND DISTRIBUTE PLAYER HANDS #############################################################
+        self.create_and_distribute_hands(player1_conn, player1_session_key, player1_public_key, 1)
+        self.create_and_distribute_hands(player2_conn, player2_session_key, player2_public_key, 2)
 
-        # Create player hands
-        player1_hand = [randint(1, 15) for _ in range(3)]
-        player2_hand = [randint(1, 15) for _ in range(3)]
-        count = Counter(player1_hand + player2_hand)
+        for i in range(self.num_rounds):
+            self.play_round(i)
+            self.wait_for_players_to_choose_cards(player1_conn, player1_session_key, player1_public_key,
+                                                  player2_conn, player2_session_key, player2_public_key, i)
 
-        # Check for 5 or more identical card numbers
-        cont = True
-        while cont:
-            # For every value in count
-            for v in count.values():
-                # If count > 4
-                if v > 4:
-                    # Regenerate hands and try again
-                    player1_hand = [randint(1, 15) for _ in range(3)]
-                    player2_hand = [randint(1, 15) for _ in range(3)]
-                    count = Counter(player1_hand + player2_hand)
-                    break
-                else:
-                    cont = False
-                    break
-
-        # Distribute player hands
-        try:
-            # Send player hands
-            M.send(player1_conn, player1_session_key, self.private_key, 'I I I', *player1_hand)
-            M.send(player2_conn, player2_session_key, self.private_key, 'I I I', *player2_hand)
-
-        except socket.error:
-            self.close_server(f'Error: could not send player hands',
-                              player1_conn, player2_conn)
-
-        # Steps 3 and 4 thrice
-        #== LOOP STARTS HERE ===============================================================================
-        for i in range(3):
-
-            # print round string
-            print(f'==================== ROUND {i+1} ====================\n')
-
-            ### WAIT FOR PLAYERS TO CHOOSE CARDS ###########################################################
-            
-            # Rounds 1 and 2
-            if i < 2:
-                try:
-                    # Print waiting message
-                    print('Waiting for players to choose...\n')
-
-                    # Get player choices
-                    player1_card = M.get(player1_conn, player1_session_key, player1_public_key, 'I', 4)[0]
-                    player2_card = M.get(player2_conn, player2_session_key, player2_public_key, 'I', 4)[0]
-
-                except ValueError:
-                    self.close_server(f'Error: could not verify digital signature',
-                                    player1_conn, player2_conn)
-                    
-                except socket.error:
-                    self.close_server(f'Error: could not received player cards',
-                                    player1_conn, player2_conn)
-            # Round 3
-            else:
-                player1_card = player1_hand[0]
-                player2_card = player2_hand[0]
-
-            # Print player cards
-            if i < 2:
-                print(f'Player1 chose {player1_card} - {player1_hand}')
-                print(f'Player2 chose {player2_card} - {player2_hand}\n')
-            else:
-                print(f"Player1's last card is {player1_card} - {player1_hand}")
-                print(f"Player2's last card is {player2_card} - {player2_hand}\n")
-
-            # Validate choice
-            if player1_card not in player1_hand or player2_card not in player2_hand:
-                self.close_server(f'Error: player card not in hand',
-                                  player1_conn, player2_conn)
-
-            # Update player hand
-            player1_hand.remove(player1_card)
-            player2_hand.remove(player2_card)
-
-            ### SEND ROUND DATA TO PLAYERS #################################################################
-
-            # Determine winner
-            # Player 2 wins
-            if player1_card == player2_card:
-                result = 0
-            # Player 1 wins
-            elif player1_card > player2_card:
-                result = 1
-                self.player1_score += 1
-            # Tie
-            else:
-                result = 2
-                self.player1_score -= 1
-
-            # Print result
-            if result != 0:
-                print(f'Player{result} Wins!\n')  
-            else:
-                print(f"It's a Tie!!\n")
-
-            # Send cards and result to players
-            M.send(player1_conn, player1_session_key, self.private_key, 'I I I',
-                   player1_card, player2_card, result)
-            
-            M.send(player2_conn, player2_session_key, self.private_key, 'I I I',
-                   player2_card, player1_card, result)
-
-            ################################################################################################
-        
-        #== LOOP ENDS HERE =================================================================================
-
-        print(f'=================================================\n')
-
-        ### PRINT FINAL RESULTS ############################################################################
-        if self.player1_score < 0:
-            print(f'PLAYER2 WINS!!!\n')
-        elif self.player1_score > 0:
-            print(f'PLAYER1 WINS!!!\n')
-        else:
-            print(f"THE GAME IS A TIE!\n")
-
-        ####################################################################################################
-
-        ### END THE GAME ###################################################################################
+        self.print_final_results()
         self.close_server(f'Have A Nice Day!!!', player1_conn, player2_conn)
-
-        ####################################################################################################
 
     
     def accept_players(self) -> None:
