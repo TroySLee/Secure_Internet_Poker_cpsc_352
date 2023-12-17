@@ -4,4 +4,4 @@ Troy Lee,
 Gregory Martinez
 
 video link:
-https://studio.youtube.com/video/XTkZTyGrxlE/edit
+https://www.youtube.com/watch?v=XTkZTyGrxlE
