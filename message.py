@@ -42,18 +42,6 @@ class Message:
     def send(connection: socket.socket, session_key: bytes, private_key: RSA.RsaKey | DSA.DsaKey, format: str, *args):
         '''
         Send objects over connection according to format
-
-        This function sends a message over the connection. The plaintext
-        is created using *args and the format and is encrypted using the 
-        session key in AES.MODE_GCM. The final message sent includes the 
-        length of the message, the ciphertext, and the digital signature
-
-        Parameters - 
-            connection (socket.socket): the connection for sending the message
-            session_key (bytes): the AES key used for encryption
-            private_key (RSA.RsaKey | DSA.DsaKey): The private key used for signing the message
-            format (str): the format for use in struct.pack()
-            *args: the object to be sent over the connection
         '''
         # Create plaintext
         plaintext = struct.pack(format, *args)
