@@ -46,7 +46,10 @@ class Client:
         self.rsa_cipher_server = PKCS1_OAEP.new(self.server_key)
 
     def start_game(self) -> None:
-        """Start the Secure Internet Poker Game."""
+        """Start of the Secure Internet Poker Game."""
+        '''
+        Used multiple functions to break down the game to simple terms.
+        '''
         self.connect_to_server()
 
         self.send_hello()
@@ -61,8 +64,12 @@ class Client:
         self.print_final_result()
 
         self.close_client(f'Have A Nice Day!!!')
+
     def connect_to_server(self) -> None:
-        """Connect to the server."""
+        """Connection to the server."""
+        '''
+        dedicated specific ip and port for server connection
+        '''
         try:
             print(f'Connecting to server at {self.ip}:{self.port}')
             self.server_socket.connect((self.ip, self.port))
@@ -72,6 +79,10 @@ class Client:
 
     def play_game(self) -> None:
         """Play the Secure Internet Poker Game."""
+        '''
+        cards will be sent to each player to pick from and the 
+        result will be shown
+        '''
         for i in range(self.NUM_ROUNDS):
             print(f'==================== ROUND {i + 1} ====================\n')
 
@@ -88,6 +99,9 @@ class Client:
             
     def choose_card(self) -> None:
         """Allow the player to choose a card."""
+        '''
+        card will be presented in a numerical value
+        '''
         print('Please choose a card from your current hand:')
         while True:
             print(f'\tCurrent hand: {self.hand}')

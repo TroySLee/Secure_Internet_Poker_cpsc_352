@@ -67,62 +67,17 @@ class Server:
 
     
     def accept_players(self) -> None:
-        '''Accept client connections until player1 and player2 connect'''
-
-        # Set listening buffer to 2
+        '''
+        Waiting for player 1 and player 2 to connect
+        '''
         self.socket.listen(2)
         print(f'Listening for connections on {self.ip}:{self.port}\n')
         while len(self.clients) < 2:
-
-            # Wait for a client to connect
+            #for client to connect
             conn, addr = self.socket.accept()
-
-            # Client connected 
+            #confirm client connected
             print(f'Client connected from {addr}')
-
-            # Recieve client message and obtain session key
-            client_message_enc = conn.recv(1024)
-            ciphertext, signature = client_message_enc[:256], client_message_enc[256:]
-
-            # Decrypt ciphertext
-            plaintext = self.rsa_cipher.decrypt(ciphertext)
-
-            # Parse plaintext
-            identity, signature_scheme, session_key = struct.unpack('I 3s 16s', plaintext)
-            public_key = self.public_keys[(identity, signature_scheme.decode('utf-8'))]
-
-            # Verify digital signature
-            try: DS.verify_dig_sign(SHA1.new(plaintext), signature, public_key)
-            except ValueError:
-                print(f'Could not verify digital signature')
-                print('Closing client connection...\n')
-                conn.close()
-                continue
-
-            ### Challenge response ###############################################################
-            # Try and get nonce
-            try: n = M.get(conn, session_key, public_key, 'I', 4)[0]
-            except socket.error:
-                print(f'Could not get client nonce')
-                conn.close()
-                continue
-
-            # Try to send f(n) where f(x) = x ** 2
-            try: M.send(conn, session_key, self.private_key, 'I', n**2)
-            except socket.error:
-                print(f'Could not send f(n)')
-                conn.close()
-                continue
-            ######################################################################################
-
-            # Add client to client dictionary
-            if identity not in self.clients:
-                self.clients[identity] = (conn, session_key, public_key)
-                print(f'Player{identity} has connected!\n')
-            else:
-                print(f'Player{identity} already connected')
-                print('Closing client connection...\n')
-                conn.close()
+            self.handle_player_connection(conn)
 
     def close_server(self, message: str, player1_conn: socket.socket, player2_conn: socket.socket):
         '''Close connections and terminate program'''
