@@ -29,4 +29,4 @@ python3 client.py < server ip > < server port > < key >
 EX: python3 client.py 127.0.0.1 1235 'sixteen byte key'
 
 When client connects to server successfully, client will be prompted to enter a message, encode it with AES and write it into encfile.bin
-# Server will receive AES encoded message, decode it with AES and write message in decfile.bin
+Server will receive AES encoded message, decode it with AES and write message in decfile.bin
