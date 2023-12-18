@@ -3,10 +3,6 @@ Group Members:
 Troy Lee,
 Gregory Martinez
 
-video link:
-
-
-
 
 ## Installation Requirements:
 
