@@ -6,8 +6,6 @@ Gregory Martinez
 video link:
 
 
-Referenced github:
-https://github.com/Barkinsons/Secure-Internet-Poker
 
 
 ## Installation Requirements:
