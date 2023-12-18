@@ -6,9 +6,9 @@ Gregory Martinez
 video link:
 
 
+Referenced github:
 https://github.com/Barkinsons/Secure-Internet-Poker
 
-(with the help of this referenced github we were able to record a demo video)
 
 ## Installation Requirements:
 
