@@ -4,7 +4,7 @@ Troy Lee,
 Gregory Martinez
 
 video link:
-https://www.youtube.com/watch?v=XTkZTyGrxlE
+
 
 https://github.com/Barkinsons/Secure-Internet-Poker
 
