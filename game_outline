@@ -1,0 +1,58 @@
+'''
+Documentation of the game, internet secure poker.
+An outline of the coding process just for the game.
+To try and achieve a working version of the game.
+
+
+class Client:
+    def __init__(self, player_num):
+         self.player_num = player_num
+         self.score = 0
+
+    def play_game(self):
+        """Play the Secure Internet Poker Game."""
+        
+        cards will be sent to each player to pick from and the 
+        result will be shown
+        
+        NUM_ROUNDS = 3
+        for i in range(self.NUM_ROUNDS):
+            print(f'==================== ROUND {i + 1} ====================\n')
+            
+            if i < 2:
+                self.choose_card()
+                print(f'Waiting for player{3 - self.player_num}...\n')
+            #round 3 will begin
+            else:
+                self.card = self.hand[0]
+
+            my_card, opponent_card, result = self.get_cards_and_result()
+
+            self.print_round_result(my_card, opponent_card, result)    
+            
+def choose_card(self):
+        """Allow the player to choose a card."""
+        
+        card will be presented in a numerical value
+        
+        print('Please choose a card from your current hand:')
+    
+        print(f'\tCurrent hand: {self.hand}')
+
+        card = input('Choice: ')
+            
+        self.hand.remove(self.card)
+
+
+def print_round_result(self, my_card, opponent_card, result):
+        """Print the result of a game round."""
+        if result == 0:
+            print(f"It's a Tie!!\n")
+        elif result == self.player_num:
+            print(f'You won the round!!!\n')
+            self.score += 1
+        else:
+            print(f'You lost the round.\n')
+            self.score -= 1
+
+'''
